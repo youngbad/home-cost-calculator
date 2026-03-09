@@ -8,4 +8,22 @@ document.addEventListener("DOMContentLoaded", function () {
       setTimeout(function () { alert.remove(); }, 500);
     }, 4000);
   });
+
+  // Dark mode toggle
+  const themeToggle = document.getElementById("theme-toggle");
+  if (themeToggle) {
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
+
+    themeToggle.addEventListener("click", function () {
+      let theme = document.documentElement.getAttribute("data-theme");
+      let newTheme = theme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      themeToggle.textContent = newTheme === "dark" ? "☀️" : "🌙";
+      
+      // Dispatch event for charts to update
+      window.dispatchEvent(new Event('themeChanged'));
+    });
+  }
 });

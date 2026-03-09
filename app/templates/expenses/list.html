@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Expenses – Reno Tracker{% endblock %}
+{% block title %}Expenses – Expense Tracker{% endblock %}
 
 {% block content %}
 <section class="page-header">
@@ -11,13 +11,17 @@
 </section>
 
 <!-- Filters -->
-<details class="card filters-panel" {% if filters.category or filters.tag or filters.date_from or filters.date_to %}open{% endif %}>
+<details class="card filters-panel" {% if filters.search or filters.category or filters.tag or filters.date_from or filters.date_to %}open{% endif %}>
   <summary>🔍 Filter &amp; Sort</summary>
-  <form method="get" action="{{ url_for('expenses.list_expenses') }}" class="filter-form">
+  <form method="get" action="{{ url_for('expenses.list_expenses') }}" class="filter-form" id="filterForm">
     <div class="form-row">
       <div class="form-group">
+        <label for="f-search">Search</label>
+        <input type="text" name="search" id="f-search" value="{{ filters.search }}" placeholder="Search name or notes..." onchange="document.getElementById('filterForm').submit();" />
+      </div>
+      <div class="form-group">
         <label for="f-category">Category</label>
-        <select name="category" id="f-category">
+        <select name="category" id="f-category" onchange="document.getElementById('filterForm').submit();">
           <option value="">All categories</option>
           {% for cat in categories %}
             <option value="{{ cat }}" {% if filters.category == cat %}selected{% endif %}>{{ cat|capitalize }}</option>
@@ -26,7 +30,7 @@
       </div>
       <div class="form-group">
         <label for="f-tag">Tag</label>
-        <select name="tag" id="f-tag">
+        <select name="tag" id="f-tag" onchange="document.getElementById('filterForm').submit();">
           <option value="">All tags</option>
           {% for t in all_tags %}
             <option value="{{ t.name }}" {% if filters.tag == t.name %}selected{% endif %}>{{ t.name }}</option>
@@ -35,15 +39,15 @@
       </div>
       <div class="form-group">
         <label for="f-from">Date from</label>
-        <input type="date" name="date_from" id="f-from" value="{{ filters.date_from }}" />
+        <input type="date" name="date_from" id="f-from" value="{{ filters.date_from }}" onchange="document.getElementById('filterForm').submit();" />
       </div>
       <div class="form-group">
         <label for="f-to">Date to</label>
-        <input type="date" name="date_to" id="f-to" value="{{ filters.date_to }}" />
+        <input type="date" name="date_to" id="f-to" value="{{ filters.date_to }}" onchange="document.getElementById('filterForm').submit();" />
       </div>
       <div class="form-group">
         <label for="f-sort">Sort by</label>
-        <select name="sort" id="f-sort">
+        <select name="sort" id="f-sort" onchange="document.getElementById('filterForm').submit();">
           <option value="date_desc" {% if filters.sort == 'date_desc' %}selected{% endif %}>Date (newest)</option>
           <option value="date_asc"  {% if filters.sort == 'date_asc'  %}selected{% endif %}>Date (oldest)</option>
           <option value="amount_desc" {% if filters.sort == 'amount_desc' %}selected{% endif %}>Amount (high)</option>
@@ -52,8 +56,8 @@
       </div>
     </div>
     <div class="filter-actions">
-      <button type="submit" class="btn btn-primary">Apply</button>
-      <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-secondary">Reset</a>
+      <noscript><button type="submit" class="btn btn-primary">Apply</button></noscript>
+      <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-secondary">Reset Filters</a>
     </div>
   </form>
 </details>
@@ -67,8 +71,8 @@
         <tr>
           <th>Name</th>
           <th>Category</th>
-          <th>Amount</th>
-          <th>Date</th>
+          <th style="cursor: pointer;" onclick="document.getElementById('f-sort').value = document.getElementById('f-sort').value === 'amount_desc' ? 'amount_asc' : 'amount_desc'; document.getElementById('filterForm').submit();">Amount ↕</th>
+          <th style="cursor: pointer;" onclick="document.getElementById('f-sort').value = document.getElementById('f-sort').value === 'date_desc' ? 'date_asc' : 'date_desc'; document.getElementById('filterForm').submit();">Date ↕</th>
           <th>Tags</th>
           <th>Notes</th>
           <th>Actions</th>
@@ -79,7 +83,7 @@
         <tr>
           <td>{{ e.name }}</td>
           <td><span class="badge badge-{{ e.category }}">{{ e.category }}</span></td>
-          <td class="amount">${{ "%.2f"|format(e.amount) }}</td>
+          <td class="amount">{{ "%.2f"|format(e.amount) }} PLN</td>
           <td>{{ e.date.strftime("%b %d, %Y") }}</td>
           <td>
             {% for t in e.tags %}
@@ -96,6 +100,13 @@
         </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr style="font-weight: bold; background-color: var(--clr-bg);">
+          <td colspan="2" style="text-align: right;">Total:</td>
+          <td class="amount">{{ "%.2f"|format(expenses|sum(attribute='amount')) }} PLN</td>
+          <td colspan="4"></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
   <p class="table-count">{{ expenses|length }} expense{{ 's' if expenses|length != 1 else '' }} found.</p>

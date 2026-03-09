@@ -20,6 +20,22 @@
   --transition: 0.18s ease;
 }
 
+[data-theme="dark"] {
+  --clr-primary: #6366f1;
+  --clr-primary-dark: #4f46e5;
+  --clr-secondary: #9ca3af;
+  --clr-danger: #f87171;
+  --clr-success: #34d399;
+  --clr-info: #22d3ee;
+  --clr-bg: #111827;
+  --clr-surface: #1f2937;
+  --clr-border: #374151;
+  --clr-text: #f9fafb;
+  --clr-muted: #9ca3af;
+  --shadow: 0 1px 4px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+}
+
 /* ============================================================
    Reset & base
    ============================================================ */
@@ -154,6 +170,16 @@ nav a:hover, nav a.active {
   margin-bottom: 1.25rem;
 }
 .chart-card { padding: 1.25rem; }
+
+/* ============================================================
+   Dashboard specific
+   ============================================================ */
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
 
 /* ============================================================
    Page header
@@ -298,6 +324,18 @@ input:focus, select:focus, textarea:focus {
 .data-table td {
   padding: 0.65rem 0.75rem;
   border-bottom: 1px solid var(--clr-border);
+}
+.data-table tbody tr {
+  transition: background-color var(--transition);
+}
+.data-table tbody tr:hover {
+  background-color: #f3f4f6;
+}
+.data-table tfoot td {
+  padding: 0.8rem 0.75rem;
+  border-top: 2px solid var(--clr-border);
+  font-size: 0.95rem;
+}
   vertical-align: middle;
 }
 .data-table tbody tr:hover { background: #fafafa; }
@@ -366,9 +404,62 @@ input:focus, select:focus, textarea:focus {
 /* ============================================================
    Responsive tweaks
    ============================================================ */
+@media (max-width: 768px) {
+  /* Header & Navigation Stack */
+  .header-inner {
+    height: auto;
+    padding: 0.75rem 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  nav a {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  /* Full-width grids for Dashboard */
+  .dashboard-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Optimize Quick Add Form Layout */
+  .quick-add-form .form-group {
+    margin-bottom: 0.5rem;
+  }
+}
+
 @media (max-width: 600px) {
-  .card-value { font-size: 1.4rem; }
-  .data-table th, .data-table td { padding: .5rem; }
+  .card-grid {
+    grid-template-columns: 1fr; /* Stack all summary cards on very small phones */
+  }
+
+  .card-value { font-size: 1.5rem; }
+  
+  .data-table th, .data-table td { padding: .6rem; font-size: 0.8rem; }
   .notes-cell { display: none; }
+  .hide-mobile { display: none; }
+  
   .page-header { flex-direction: column; align-items: flex-start; }
+  .header-actions { width: 100%; justify-content: flex-start; }
 }

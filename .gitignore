@@ -18,3 +18,5 @@ instance/
 migrations/versions/
 .DS_Store
 *.log
+instance/
+Remont Jenkowice.xlsx
