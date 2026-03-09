@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Scan Receipt – Expense Tracker{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Scan Receipt</h1>
+  <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-secondary">← Back</a>
+</section>
+
+<div class="card form-card">
+  <p style="margin-bottom: 1.5rem; color: var(--clr-muted);">
+    Upload a photo of your receipt or invoice. Our AI will automatically extract the name, amount, date, and category for you.
+  </p>
+
+  <form method="post" enctype="multipart/form-data" id="scanForm">
+    <div class="form-group" style="margin-bottom: 1.5rem;">
+      <label for="receipt" style="display: block; margin-bottom: 0.5rem;">Select Image</label>
+      
+      <div class="file-upload-wrapper" style="position: relative; border: 2px dashed var(--clr-border); border-radius: var(--radius); padding: 2rem; text-align: center; transition: border-color var(--transition);">
+        <input type="file" id="receipt" name="receipt" accept="image/*" required style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="updateFileName(this)" />
+        <div style="font-size: 3rem; margin-bottom: 1rem; pointer-events: none;">📸</div>
+        <p id="fileNameDisplay" style="font-weight: 600; margin-bottom: 0.5rem; pointer-events: none;">Click to browse or take a photo</p>
+        <p style="font-size: 0.85rem; color: var(--clr-muted); pointer-events: none;">Supports JPG, PNG, WEBP</p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%;">
+        <span id="btnText">Analyze Receipt</span>
+        <span id="btnLoading" style="display: none;">⏳ Analyzing... Please wait</span>
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateFileName(input) {
+  const display = document.getElementById('fileNameDisplay');
+  if (input.files && input.files.length > 0) {
+    display.textContent = input.files[0].name;
+    display.style.color = 'var(--clr-primary)';
+  } else {
+    display.textContent = 'Click to browse or take a photo';
+    display.style.color = 'inherit';
+  }
+}
+
+document.getElementById('scanForm').addEventListener('submit', function() {
+  const btn = document.getElementById('submitBtn');
+  const text = document.getElementById('btnText');
+  const loading = document.getElementById('btnLoading');
+  
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+  text.style.display = 'none';
+  loading.style.display = 'inline-block';
+});
+</script>
+{% endblock %}

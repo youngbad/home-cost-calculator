@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if expense and expense.id else "Add" }} Expense - Expense Tracker{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>{{ "Edit" if expense and expense.id else "Add" }} Expense</h1>
+  <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-secondary">← Back</a>
+</section>
+
+<div class="card form-card">
+  <form method="post" novalidate>
+    <div class="form-row">
+      <div class="form-group form-group--wide">
+        <label for="name">Name <span class="required">*</span></label>
+        <input type="text" id="name" name="name" required maxlength="128"
+               value="{{ expense.name if expense else '' }}"
+               placeholder="e.g. Kitchen tiles" />
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category <span class="required">*</span></label>
+        <select id="category" name="category" required onchange="toggleCustomCategory()">
+          <option value="">Select category…</option>
+          {% for cat in categories %}
+            <option value="{{ cat }}" {% if expense and expense.category == cat %}selected{% endif %}>{{ cat|capitalize }}</option>
+          {% endfor %}
+          <option value="custom">-- Custom --</option>
+        </select>
+        <div id="custom-category-group" style="display: none; margin-top: 0.5rem;">
+          <input type="text" id="custom_category" name="custom_category" placeholder="Enter custom category" class="form-control" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="amount">Amount (PLN) <span class="required">*</span></label>
+        <input type="number" id="amount" name="amount" required min="0.01" step="0.01"
+               value="{{ expense.amount if expense else '' }}"
+               placeholder="0.00" />
+      </div>
+
+      <div class="form-group">
+        <label for="date">Date <span class="required">*</span></label>
+        <input type="date" id="date" name="date" required
+               value="{{ expense.date if expense and expense.date is string else (expense.date.isoformat() if expense and expense.date else '') }}" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="tags">Tags</label>
+      <input type="text" id="tags" name="tags"
+             value="{{ expense.tags|map(attribute='name')|join(', ') if expense else '' }}"
+             placeholder="kitchen, bathroom, garden  (comma-separated)" />
+      {% if all_tags %}
+      <p class="field-hint">
+        Existing tags:
+        {% for t in all_tags %}
+          <button type="button" class="tag tag-clickable" onclick="addTag('{{ t.name }}')">{{ t.name }}</button>
+        {% endfor %}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" rows="3" placeholder="Optional details…">{{ expense.notes if expense else '' }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{{ "Save Changes" if expense and expense.id else "Add Expense" }}</button>
+      <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addTag(name) {
+  const input = document.getElementById("tags");
+  const current = input.value.split(",").map(t => t.trim()).filter(Boolean);
+  if (!current.includes(name)) {
+    current.push(name);
+    input.value = current.join(", ");
+  }
+}
+
+function toggleCustomCategory() {
+  const sel = document.getElementById("category");
+  const grp = document.getElementById("custom-category-group");
+  const inp = document.getElementById("custom_category");
+  if (sel.value === "custom") {
+    grp.style.display = "block";
+    inp.required = true;
+  } else {
+    grp.style.display = "none";
+    inp.required = false;
+    inp.value = "";
+  }
+}
+</script>
+{% endblock %}
